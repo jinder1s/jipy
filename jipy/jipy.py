@@ -2,25 +2,17 @@
 import sys
 from os import path
 
-# from scanner import Scanner
-#
-
-
-class Scanner:
-    """Temporarily here till a true scanner class is implemented"""
-
-    def __init__(self):
-        pass
+from .scanner import Scanner
 
 
 HAD_ERROR = False
 
 
-def jipy(args):
+def jipy(args: list = None):
     """Entry point for the jipy language."""
     if len(args) > 1:
-        raise Exception
-    if path.isfile(args[0]):
+        raise Exception("You passed in too many values to Jipy")
+    if len(args) == 1 and path.isfile(args[0]):
         run_file(args[0])
     else:
         run_prompt()
