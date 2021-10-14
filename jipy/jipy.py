@@ -5,10 +5,7 @@ from os import path
 from .scanner import Scanner
 
 
-HAD_ERROR = False
-
 class Jipy:
-
     def __init__(self):
         self.HAD_ERROR = False
 
@@ -21,15 +18,13 @@ class Jipy:
         else:
             self.run_prompt()
 
-
     def run_file(self, source_file_path):
         """TODO."""
         with open(source_file_path) as source_file:
-            source = source_file.readlines()
+            source = source_file.read()
             self.run(source)
             if self.HAD_ERROR:
                 sys.exit()
-
 
     def run_prompt(self):
         """Run jipy in REPL."""
@@ -40,9 +35,8 @@ class Jipy:
                 break
             else:
                 if line:
-                   self.run(line)
+                    self.run(line)
                     self.HAD_ERROR = False
-
 
     def run(self, source):
         """TODO."""
@@ -51,11 +45,9 @@ class Jipy:
         for token in tokens:
             print(token)
 
-
     def error(self, line_num, message):
         """TODO."""
         self.report(line_num, "", message)
-
 
     def report(self, line_num, where, message):
         """UI for error reporting."""

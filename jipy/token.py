@@ -2,7 +2,7 @@
 
 
 class Token:
-    def __init__(token_type, lexeme, literal, line):
+    def __init__(self, token_type, lexeme, literal, line):
         self.token_type = token_type
         self.lexeme = lexeme
         self.literal = literal
@@ -10,3 +10,6 @@ class Token:
 
     def to_string(self):
         return f"{self.token_type}: {self.lexeme} {self.literal}"
+
+    def __repr__(self):
+        return self.to_string()
