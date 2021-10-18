@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Scanner for jipy language."""
-from .token_types import TokenTypes
-from .token import Token
-from .error import Error
+from jipy.token_types import TokenTypes
+from jipy.token import Token
+from jipy.error import Error
 
 class Scanner:
     def __init__(self, source):

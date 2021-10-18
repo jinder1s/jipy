@@ -2,7 +2,7 @@
 import sys
 from os import path
 
-from .scanner import Scanner
+from jipy.scanner import Scanner
 
 
 class Jipy:
