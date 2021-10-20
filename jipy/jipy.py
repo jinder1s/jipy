@@ -33,6 +33,8 @@ class Jipy:
                 line = input("> ")
             except EOFError:
                 break
+            except KeyboardInterrupt:
+                print("Keyboard Interrupt")
             else:
                 if line:
                     self.run(line)
