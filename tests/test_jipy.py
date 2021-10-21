@@ -30,3 +30,15 @@ def test_jipy_invalid_input():
     # Jipy should error out if too many values inputted
     with pytest.raises(Exception) as contest:
         jipy.jipy(["1", "2"])
+
+
+def test_jipy_run():
+    jipy = Jipy()
+    source = "true == true"
+    jipy.run(source)
+
+
+def test_jipy_run2():
+    jipy = Jipy()
+    source = "(true == true)"
+    jipy.run(source)

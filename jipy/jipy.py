@@ -3,6 +3,10 @@ import sys
 from os import path
 
 from jipy.scanner import Scanner
+from jipy.parser import Parser
+from jipy.error import JipyError
+from jipy.token_types import TokenTypes
+from jipy.ast_printer import AstPrinter
 
 
 class Jipy:
@@ -44,17 +48,14 @@ class Jipy:
         """TODO."""
         scanner = Scanner(source)
         tokens = scanner.scan_tokens()
-        for token in tokens:
-            print(token)
-
-    def error(self, line_num, message):
-        """TODO."""
-        self.report(line_num, "", message)
-
-    def report(self, line_num, where, message):
-        """UI for error reporting."""
-        print(f"[line {line_num}] Error {where}: {message}")
-        self.HAD_ERROR = True
+        if len(tokens) == 1:
+            if tokens[0].token_type is TokenTypes.EOF:
+                JipyError.error(tokens[0], "Source file is empty")
+        parser = Parser(tokens)
+        expression = parser.parse()
+        if JipyError.HAD_ERROR:
+            return
+        print(AstPrinter().print(expression))
 
 
 if __name__ == "__main__":

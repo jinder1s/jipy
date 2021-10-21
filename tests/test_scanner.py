@@ -48,13 +48,14 @@ def test_match(current, input_val, source, result):
     scanner._current = current
     assert scanner.match(input_val) is result
 
+
 @pytest.mark.parametrize(
     "current, source, expected",
     [
-        (0, "abc", 'a'),
-        (2, "abc", 'c'),
-        (3, "abc", '\0'),
-    ]
+        (0, "abc", "a"),
+        (2, "abc", "c"),
+        (3, "abc", "\0"),
+    ],
 )
 def test_peek(current, source, expected):
     scanner = Scanner(source)
@@ -65,16 +66,17 @@ def test_peek(current, source, expected):
 @pytest.mark.parametrize(
     "current, source, expected",
     [
-        (0, "abc", 'b'),
-        (1, "abc", 'c'),
-        (2, "abc", '\0'),
-        (3, "abc", '\0'),
-    ]
+        (0, "abc", "b"),
+        (1, "abc", "c"),
+        (2, "abc", "\0"),
+        (3, "abc", "\0"),
+    ],
 )
 def test_peek_next(current, source, expected):
     scanner = Scanner(source)
     scanner._current = current
     assert scanner.peek_next() == expected
+
 
 @pytest.mark.parametrize(
     "token_type, lexeme, current",
@@ -117,11 +119,14 @@ def test_is_alpha(char, expected):
 
 
 @pytest.mark.parametrize(
-    "char,expected", [("a", True), ("d", True), ("1", True), ("\n", False), (';', False), ('.', False)]
+    "char,expected",
+    [("a", True), ("d", True), ("1", True), ("\n", False), (";", False), (".", False)],
 )
 def test_is_alpha_numeric(char, expected):
     scanner = Scanner("")
     assert scanner.is_alpha_numeric(char) == expected
+
+
 @pytest.mark.parametrize(
     "token_type, lexeme",
     [(TokenTypes.LEFT_PAREN, "("), (TokenTypes.LEFT_BRACE, "{"), (TokenTypes.DOT, ".")],
@@ -197,7 +202,7 @@ def test_scan_token_two_char(token_type, lexeme):
             ],
         ),
         (
-            '( a = 1)',
+            "( a = 1)",
             [
                 TokenTypes.LEFT_PAREN,
                 TokenTypes.IDENTIFIER,

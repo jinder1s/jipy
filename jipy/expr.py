@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 from jipy.token import Token
 
+
 @dataclass
 class Expr(ABC):
     @abstractmethod
@@ -26,7 +27,6 @@ class Binary(Expr):
 class Grouping(Expr):
     expression: Expr
 
-
     def accept(self, visitor):
         return visitor.visit_grouping_expr(self)
 
@@ -44,13 +44,11 @@ class Unary(Expr):
 class Literal(Expr):
     value: object
 
-
     def accept(self, visitor):
         return visitor.visit_literal_expr(self)
 
 
 class BaseVisitor(ABC):
-
     @abstractmethod
     def visit_binary_expr(self, expr: Binary):
         return NotImplemented
@@ -62,7 +60,6 @@ class BaseVisitor(ABC):
     @abstractmethod
     def visit_unary_expr(self, expr: Unary):
         return NotImplemented
-
 
     @abstractmethod
     def visit_literal_expr(self, expr: Literal):

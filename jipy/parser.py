@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
+from typing import List
 
 from jipy.token_types import TokenTypes
 from jipy.token import Token
 from jipy.expr import Binary, Unary, Literal, Grouping
+from jipy.error import ParserError
 
 
 class Parser:
-
     def __init__(self, tokens: List[Token]):
         self._tokens = tuple(tokens)
         self._current = 0
@@ -16,7 +17,6 @@ class Parser:
             if self.check(token_type):
                 self.advance()
                 return True
-
         return False
 
     def check(self, token_type: TokenTypes):
@@ -38,31 +38,41 @@ class Parser:
     def previous(self):
         return self._tokens[self._current - 1]
 
-    def consume(self, token_type: TokenType, message: str):
-        if self.check():
+    def consume(self, token_type: TokenTypes, message: str):
+        if self.check(token_type):
             return self.advance()
         raise self.error(self.peek(), message)
 
     def error(self, token: Token, message: str):
-        self.error_handler.error(token, message)
-        return ParseError()
+        return ParserError(token, message)
+
+    def parse(self):
+        try:
+            return self.expression()
+        except ParserError as err:
+            return None
 
     def expression(self):
         return self.equality()
 
     def equality(self):
-        expr = self.comparision()
+        expr = self.comparison()
         while self.match(TokenTypes.BANG_EQUAL, TokenTypes.EQUAL_EQUAL):
-             operator = self.previous()
-             right = self.comparision()
-             expr = Binary(expr, operator, right)
+            operator = self.previous()
+            right = self.comparison()
+            expr = Binary(expr, operator, right)
 
         return expr
 
     def comparison(self):
         expr = self.term()
 
-        while self.match(TokenTypes.GREATER, TokenTypes.GREATER_EQUAL, TokenTypes.LESS, TokenTypes.LESS_EQUAL):
+        while self.match(
+            TokenTypes.GREATER,
+            TokenTypes.GREATER_EQUAL,
+            TokenTypes.LESS,
+            TokenTypes.LESS_EQUAL,
+        ):
             operator = self.previous()
             right = self.term()
             expr = Binary(expr, operator, right)
@@ -97,9 +107,9 @@ class Parser:
         return self.primary()
 
     def primary(self):
-        expr = None # TODO: Check if returning a None is handled correctly
+        expr = None  # TODO: Check if returning a None is handled correctly
         if self.match(TokenTypes.FALSE):
-            expr =  Literal(False)
+            expr = Literal(False)
         elif self.match(TokenTypes.TRUE):
             expr = Literal(True)
         elif self.match(TokenTypes.NIL):
@@ -110,4 +120,6 @@ class Parser:
             sub_expr = self.expression()
             self.consume(TokenTypes.RIGHT_PAREN, "Expect ')' after expression.")
             expr = Grouping(sub_expr)
+        else:
+            raise self.error(self.peek(), "Expected Expression.")
         return expr

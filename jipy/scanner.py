@@ -2,9 +2,54 @@
 """Scanner for jipy language."""
 from jipy.token_types import TokenTypes
 from jipy.token import Token
-from jipy.error import Error
+from jipy.error import JipyError
+
 
 class Scanner:
+    SINGLE_CHAR_TOKENS = {
+        "(": TokenTypes.LEFT_PAREN,
+        ")": TokenTypes.RIGHT_PAREN,
+        "{": TokenTypes.LEFT_BRACE,
+        "}": TokenTypes.RIGHT_BRACE,
+        ",": TokenTypes.COMMA,
+        ".": TokenTypes.DOT,
+        "-": TokenTypes.MINUS,
+        "+": TokenTypes.PLUS,
+        ";": TokenTypes.SEMICOLON,
+        "*": TokenTypes.STAR,
+    }
+
+    TWO_CHAR_TOKENS = {
+        "!": ("=", TokenTypes.BANG_EQUAL, TokenTypes.BANG),
+        "<": ("=", TokenTypes.LESS_EQUAL, TokenTypes.LESS),
+        ">": ("=", TokenTypes.GREATER_EQUAL, TokenTypes.GREATER),
+        "=": ("=", TokenTypes.EQUAL_EQUAL, TokenTypes.EQUAL),
+        # "=": {"": TokenTypes.EQUAL,
+        #       "=": TokenTypes.EQUAL_EQUAL,
+        #       },
+        # "<": {""}
+    }
+    MEANINGLESS_CHARACTERS = (" ", "\r", "\t")
+
+    RESERVED_WORDS = {
+        "and": TokenTypes.AND,
+        "class": TokenTypes.CLASS,
+        "else": TokenTypes.ELSE,
+        "false": TokenTypes.FALSE,
+        "for": TokenTypes.FOR,
+        "fun": TokenTypes.FUNCTION,
+        "if": TokenTypes.IF,
+        "nil": TokenTypes.NIL,
+        "or": TokenTypes.OR,
+        "print": TokenTypes.PRINT,
+        "return": TokenTypes.RETURN,
+        "super": TokenTypes.SUPER,
+        "this": TokenTypes.THIS,
+        "true": TokenTypes.TRUE,
+        "var": TokenTypes.VAR,
+        "while": TokenTypes.WHILE,
+    }
+
     def __init__(self, source):
         self.source = source
 
@@ -13,50 +58,6 @@ class Scanner:
         self._line = 1
 
         self.tokens = []
-
-        self.SINGLE_CHAR_TOKENS = {
-            "(": TokenTypes.LEFT_PAREN,
-            ")": TokenTypes.RIGHT_PAREN,
-            "{": TokenTypes.LEFT_BRACE,
-            "}": TokenTypes.RIGHT_BRACE,
-            ",": TokenTypes.COMMA,
-            ".": TokenTypes.DOT,
-            "-": TokenTypes.MINUS,
-            "+": TokenTypes.PLUS,
-            ";": TokenTypes.SEMICOLON,
-            "*": TokenTypes.STAR,
-        }
-
-        self.TWO_CHAR_TOKENS = {
-            "!": ("=", TokenTypes.BANG_EQUAL, TokenTypes.BANG),
-            "<": ("=", TokenTypes.LESS_EQUAL, TokenTypes.LESS),
-            ">": ("=", TokenTypes.GREATER_EQUAL, TokenTypes.GREATER),
-            "=": ("=", TokenTypes.EQUAL_EQUAL, TokenTypes.EQUAL),
-            # "=": {"": TokenTypes.EQUAL,
-            #       "=": TokenTypes.EQUAL_EQUAL,
-            #       },
-            # "<": {""}
-        }
-        self.MEANINGLESS_CHARACTERS = (" ", "\r", "\t")
-
-        self.RESERVED_WORDS = {
-            "and": TokenTypes.AND,
-            "class": TokenTypes.CLASS,
-            "else": TokenTypes.ELSE,
-            "false": TokenTypes.FALSE,
-            "for": TokenTypes.FOR,
-            "fun": TokenTypes.FUNCTION,
-            "if": TokenTypes.IF,
-            "nil": TokenTypes.NIL,
-            "or": TokenTypes.OR,
-            "print": TokenTypes.PRINT,
-            "return": TokenTypes.RETURN,
-            "super": TokenTypes.SUPER,
-            "this": TokenTypes.THIS,
-            "true": TokenTypes.TRUE,
-            "var": TokenTypes.VAR,
-            "while": TokenTypes.WHILE,
-        }
 
     def is_end(self):
         return self._current == len(self.source)
@@ -133,7 +134,7 @@ class Scanner:
 
         if self.is_end():
             # TODO: figure out what to do about errors
-            Error(self._line, "Unterminated string")
+            JipyError.report(self._line, "", "Unterminated string")
 
         self.advance()
 
@@ -142,14 +143,10 @@ class Scanner:
         self.add_token(TokenTypes.STRING, string_value)
 
     def is_digit(self, char):
-        return char >= "0" and char <= "9"
+        return '0' <= char <= "9"
 
     def is_alpha(self, char):
-        return (
-            (char >= "a" and char <= "z")
-            or (char >= "A" and char <= "Z")
-            or char == "_"
-        )
+        return "a" <= char <= "z" or "A" <= char <= "Z" or char == "_"
 
     def is_alpha_numeric(self, char):
         return self.is_alpha(char) or self.is_digit(char)
