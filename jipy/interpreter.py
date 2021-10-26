@@ -1,10 +1,20 @@
 #!/usr/bin/env python3
+from typing import List, Object
 from jipy.expr import BaseVisitor, Binary, Grouping, Unary, Literal, Expr
 from jipy.token_types import TokenTypes
+from jipy.token import Token
+from jipy.error import RunTimeError, JipyError
 
 
 
 class Interpreter(BaseVisitor):
+
+    def interpret(self, expression: Expr):
+        try:
+            value = self.evaluate(expression)
+            print(value)
+        except RunTimeError as err:
+            JipyError.run_time_error(err)
 
     def evaluate(self, expr: Expr):
         return expr.accept(self)
@@ -22,24 +32,40 @@ class Interpreter(BaseVisitor):
             return False
         return left == right
 
+    def check_if_number(self, operator: Token, *operands: List(Object)):
+
+        is_not_number =  [ type(operand) != int and type(operand) != float for operand in operands]
+        if any(is_not_number):
+            raise RunTimeError(operator, "Operand must be a number, is type")
+
+
     def visit_binary_expr(self, expr: Binary):
         left = self.evaluate(expr.left)
         right = self.evalute(expr.right)
         if expr.operator.token_type == TokenTypes.Minus:
+            self.check_if_number(expr.operator, left, right)
             return left - right
         elif expr.operator.token_type == TokenTypes.SLASH:
+            self.check_if_number(expr.operator, left, right)
             return left/right
         elif expr.operator.token_type == TokenTypes.STAR:
+            self.check_if_number(expr.operator, left, right)
             return left * right
         elif expr.operator.token_type == TokenTypes.PLUS:
-            return left + right
+            if type(left) in [int, float, str] or type(right) in [int, float, str]:
+                return left + right
+            raise RunTimeError(expr.operator, "Operansd must be two numbers or two strings")
         elif expr.operator.token_type == TokenTypes.GREATER:
+            self.check_if_number(expr.operator, left, right)
             return left > right
         elif expr.operator.token_type == TokenTypes.GREATER_EQUAL:
+            self.check_if_number(expr.operator, left, right)
             return left >= right
         elif expr.operator.token_type == TokenTypes.LESS:
+            self.check_if_number(expr.operator, left, right)
             return left < right
         elif expr.operator.token_type == TokenTypes.LESS_EQUAL:
+            self.check_if_number(expr.operator, left, right)
             return left <= right
         elif expr.operator.token_type == TokenTypes.BANG_EQUAL:
             return not self.is_equal(left, right)
@@ -54,6 +80,7 @@ class Interpreter(BaseVisitor):
     def visit_unary_expr(self, expr: Unary):
         right = self.evaluate(expr.right)
         if expr.operator.token_type == TokenTypes.MINUS:
+            self.check_if_number(expr.operator, right)
             return -1 * right
         elif expr.operator.token_type == TokenTypes.BANG:
             return not self.is_truthy(right)

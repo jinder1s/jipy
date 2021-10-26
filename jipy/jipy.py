@@ -7,11 +7,13 @@ from jipy.parser import Parser
 from jipy.error import JipyError
 from jipy.token_types import TokenTypes
 from jipy.ast_printer import AstPrinter
+from jipy.interpreter import Interpreter
 
 
 class Jipy:
     def __init__(self):
         self.HAD_ERROR = False
+        self.interpreter = Interpreter()
 
     def jipy(self, args: list = None):
         """Entry point for the jipy language."""
@@ -27,7 +29,7 @@ class Jipy:
         with open(source_file_path) as source_file:
             source = source_file.read()
             self.run(source)
-            if self.HAD_ERROR:
+            if JipyError.HAD_ERROR:
                 sys.exit()
 
     def run_prompt(self):
@@ -42,7 +44,7 @@ class Jipy:
             else:
                 if line:
                     self.run(line)
-                    self.HAD_ERROR = False
+                    JipyError.HAD_ERROR == False
 
     def run(self, source):
         """TODO."""
