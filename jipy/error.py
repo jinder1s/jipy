@@ -35,3 +35,8 @@ class JipyError:
         """TODO."""
         JipyError.HAD_ERROR = True
         self.report(line_num, "", message)
+
+    @staticmethod
+    def run_time_error(self, error: RunTimeError):
+        self.HAD_RUNTIME_ERROR = True
+        self.report(error.token.line, "", error.message)

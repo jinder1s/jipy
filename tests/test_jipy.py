@@ -33,12 +33,14 @@ def test_jipy_invalid_input():
 
 
 def test_jipy_run():
+    # TODO: this is not a valid test
     jipy = Jipy()
     source = "true == true"
     jipy.run(source)
 
 
 def test_jipy_run2():
+    # TODO: this is not a valid test
     jipy = Jipy()
-    source = "(true == true)"
+    source = "(true != true)"
     jipy.run(source)

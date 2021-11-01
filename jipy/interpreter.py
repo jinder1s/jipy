@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import List, Object
+from typing import List, Any
 from jipy.expr import BaseVisitor, Binary, Grouping, Unary, Literal, Expr
 from jipy.token_types import TokenTypes
 from jipy.token import Token
@@ -13,26 +13,28 @@ class Interpreter(BaseVisitor):
         try:
             value = self.evaluate(expression)
             print(value)
+            breakpoint()
         except RunTimeError as err:
             JipyError.run_time_error(err)
 
     def evaluate(self, expr: Expr):
         return expr.accept(self)
 
-    def is_truthy(self, _object: Object):
+    def is_truthy(self, _object: Any):
         if _object is None:
             return False
         elif isinstance(_object, bool):
             return False
         return True
-    def is_equal(self, left: Object, right: Object):
+
+    def is_equal(self, left: Any, right: Any):
         if left is None and right is None:
             return True
         elif left is None:
             return False
         return left == right
 
-    def check_if_number(self, operator: Token, *operands: List(Object)):
+    def check_if_number(self, operator: Token, *operands: List[Any]):
 
         is_not_number =  [ type(operand) != int and type(operand) != float for operand in operands]
         if any(is_not_number):
@@ -41,8 +43,8 @@ class Interpreter(BaseVisitor):
 
     def visit_binary_expr(self, expr: Binary):
         left = self.evaluate(expr.left)
-        right = self.evalute(expr.right)
-        if expr.operator.token_type == TokenTypes.Minus:
+        right = self.evaluate(expr.right)
+        if expr.operator.token_type == TokenTypes.MINUS:
             self.check_if_number(expr.operator, left, right)
             return left - right
         elif expr.operator.token_type == TokenTypes.SLASH:
@@ -75,7 +77,7 @@ class Interpreter(BaseVisitor):
         
 
     def visit_grouping_expr(self, expr: Grouping):
-        return self.evalutate(expr.expression)
+        return self.evaluate(expr.expression)
 
     def visit_unary_expr(self, expr: Unary):
         right = self.evaluate(expr.right)

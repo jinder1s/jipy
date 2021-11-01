@@ -30,7 +30,9 @@ class Jipy:
             source = source_file.read()
             self.run(source)
             if JipyError.HAD_ERROR:
-                sys.exit()
+                sys.exit(65)
+            if JipyError.HAD_RUNTIME_ERROR:
+                sys.exit(70)
 
     def run_prompt(self):
         """Run jipy in REPL."""
@@ -45,6 +47,7 @@ class Jipy:
                 if line:
                     self.run(line)
                     JipyError.HAD_ERROR == False
+                    JipyError.HAD_RUNTTIME_ERROR == False
 
     def run(self, source):
         """TODO."""
@@ -57,7 +60,7 @@ class Jipy:
         expression = parser.parse()
         if JipyError.HAD_ERROR:
             return
-        print(AstPrinter().print(expression))
+        self.interpreter.interpret(expression)
 
 
 if __name__ == "__main__":
